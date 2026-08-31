@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Pets — Controle de Produção e Vendas</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yellowtail&family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="mark">
+      <span class="paw-icon" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 44C15 44 6 37 6 29c0-6 5-9 18-9s18 3 18 9c0 8-9 15-18 15Z" stroke="#93AEDD" stroke-width="2.4"/>
+          <ellipse cx="24" cy="12" rx="5" ry="6.5" fill="#93AEDD"/>
+          <ellipse cx="10" cy="18" rx="4.2" ry="5.5" fill="#93AEDD"/>
+          <ellipse cx="38" cy="18" rx="4.2" ry="5.5" fill="#93AEDD"/>
+          <ellipse cx="14" cy="9" rx="3.4" ry="4.4" fill="#93AEDD"/>
+          <ellipse cx="34" cy="9" rx="3.4" ry="4.4" fill="#93AEDD"/>
+        </svg>
+      </span>
+      <h1 class="logo">Big Pets</h1>
+      <span class="sub">controle de produção e vendas</span>
+    </div>
+    <span class="sync-indicator" id="sync-indicator">conectando...</span>
+  </header>
+
+  <nav class="tabs">
+    <button data-view="painel" class="active">Painel</button>
+    <button data-view="producao">Produção</button>
+    <button data-view="vendas">Vendas</button>
+    <button data-view="clientes">Clientes</button>
+  </nav>
+
+  <!-- PAINEL -->
+  <section class="view active" id="view-painel">
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <div class="card">
+      <h2>Estoque por modelo</h2>
+      <div class="desc">Produzido menos vendido, por modelo e cor.</div>
+      <table id="tbl-estoque"><thead><tr><th>Modelo</th><th>Cor</th><th>Estoque</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="card">
+      <h2>Hora de visitar</h2>
+      <div class="desc">Clientes ordenados por tempo desde a última compra.</div>
+      <table id="tbl-retorno"><thead><tr><th>Cliente</th><th>Cidade</th><th>Última compra</th><th>Dias</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- PRODUÇÃO -->
+  <section class="view" id="view-producao">
+    <div class="card">
+      <h2>Modelos do catálogo</h2>
+      <div class="desc">Referência rápida — o modelo real pode ter outras cores além destas.</div>
+      <div class="catalogo-grid">
+        <div class="catalogo-item"><strong>Chalé</strong><span>Rose · Caramelo</span></div>
+        <div class="catalogo-item"><strong>Celeiro</strong><span>Campo · Montanha</span></div>
+        <div class="catalogo-item"><strong>Casinha dois andares</strong><span>Marrom · Bege · Verde · Creme</span></div>
+        <div class="catalogo-item"><strong>Arranhador</strong><span>Verde-musgo · Pink · Azul-marinho · Cinza</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Registrar produção</h2>
+      <div class="desc">O que foi feito e quando.</div>
+      <form id="form-producao">
+        <div class="row">
+          <div class="field"><label>Data</label><input type="date" name="data" required></div>
+          <div class="field"><label>Modelo</label><input type="text" name="modelo" list="lista-modelos" placeholder="Ex: Casinha Redonda" required></div>
+          <div class="field"><label>Cor</label><input type="text" name="cor" list="lista-cores" placeholder="Ex: Bege" required></div>
+          <div class="field" style="flex:0 0 100px"><label>Quantidade</label><input type="number" name="quantidade" min="1" required></div>
+        </div>
+        <button class="btn" type="submit">Adicionar produção</button>
+        <div class="status" id="status-producao"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Histórico de produção</h2>
+      <table id="tbl-producao"><thead><tr><th>Data</th><th>Modelo</th><th>Cor</th><th>Qtd.</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- VENDAS -->
+  <section class="view" id="view-vendas">
+    <div class="card">
+      <h2>Registrar venda</h2>
+      <div class="desc">Escolha o cliente já cadastrado ou cadastre um novo na aba Clientes.</div>
+      <form id="form-venda">
+        <div class="row">
+          <div class="field"><label>Data</label><input type="date" name="data" required></div>
+          <div class="field" style="flex:1 1 220px"><label>Cliente</label><select name="clienteId" required><option value="">Selecione...</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Modelo</label><input type="text" name="modelo" list="lista-modelos" required></div>
+          <div class="field"><label>Cor</label><input type="text" name="cor" list="lista-cores" required></div>
+          <div class="field" style="flex:0 0 100px"><label>Quantidade</label><input type="number" name="quantidade" min="1" required></div>
+          <div class="field" style="flex:0 0 140px"><label>Valor unitário (R$)</label><input type="number" name="valorUnitario" min="0" step="0.01" required></div>
+        </div>
+        <button class="btn" type="submit">Adicionar venda</button>
+        <div class="status" id="status-venda"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Histórico de vendas</h2>
+      <table id="tbl-vendas"><thead><tr><th>Data</th><th>Cliente</th><th>Produto</th><th>Qtd.</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section class="view" id="view-clientes">
+    <div class="card">
+      <h2>Cadastrar cliente</h2>
+      <div class="desc">Agropecuárias ou clientes atendidos porta a porta.</div>
+      <form id="form-cliente">
+        <div class="row">
+          <div class="field" style="flex:1 1 200px"><label>Nome</label><input type="text" name="nome" required></div>
+          <div class="field"><label>Cidade</label><input type="text" name="cidade" required></div>
+        </div>
+        <div class="row">
+          <div class="field" style="flex:1 1 220px"><label>Endereço</label><input type="text" name="endereco"></div>
+          <div class="field" style="flex:0 0 160px"><label>Telefone</label><input type="text" name="telefone"></div>
+        </div>
+        <button class="btn" type="submit">Adicionar cliente</button>
+        <div class="status" id="status-cliente"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Clientes cadastrados</h2>
+      <table id="tbl-clientes"><thead><tr><th>Nome</th><th>Cidade</th><th>Telefone</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <datalist id="lista-modelos"></datalist>
+  <datalist id="lista-cores"></datalist>
+
+  <footer class="footer">
+    Big Pets · Adriana &amp; Márcio · Tramandaí/RS · @_bigpets
+  </footer>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
