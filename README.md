@@ -13,7 +13,7 @@ usando o Firebase (banco de dados gratuito do Google).
   ordenada por tempo desde a última compra (para saber quem visitar).
 - **Produção**: registra o que foi feito, modelo, cor e quantidade.
 - **Vendas**: registra vendas vinculadas a um cliente, com cálculo automático do total.
-- **Clientes**: cadastro com nome, cidade, endereço e telefone, com histórico de
+- **Clientes**: cadastro com nome, cidade, endereço e telefone, cnpj, com histórico de
   compras de cada um.
 
 ## Passo 1 — Criar o banco de dados gratuito (Firebase)
