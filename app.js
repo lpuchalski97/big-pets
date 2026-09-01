@@ -223,11 +223,11 @@ document.getElementById('form-cliente').addEventListener('submit', async e=>{
 
 function renderClientes(){
   const rows = dados.clientes.map(c=>
-    `<tr><td><span class="client-link" data-ver-historico="${c.id}">${c.nome}</span>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}</td><td>${c.cidade}</td><td>${c.telefone||'—'}</td>
+    `<tr><td><span class="client-link" data-ver-historico="${c.id}">${c.nome}</span>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}</td><td>${c.cidade}</td><td>${c.cnpj||'—'}</td><td>${c.telefone||'—'}</td>
       <td><button class="btn ghost" data-editar-cliente="${c.id}">editar</button></td>
       <td><button class="btn ghost" data-remover-cliente="${c.id}">remover</button></td></tr>`
   ).join('');
-  document.querySelector('#tbl-clientes tbody').innerHTML = rows || `<tr><td colspan="5" class="empty">Nenhum cliente cadastrado.</td></tr>`;
+  document.querySelector('#tbl-clientes tbody').innerHTML = rows || `<tr><td colspan="6" class="empty">Nenhum cliente cadastrado.</td></tr>`;
 
   const sel = document.querySelector('#form-venda select[name=clienteId]');
   const atual = sel.value;
@@ -254,8 +254,22 @@ function verHistorico(id){
   const box = document.createElement('div');
   box.className = 'hist-box';
   box.id = 'hist-temp';
-  box.innerHTML = `<strong>${c.nome}</strong>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''} — ${c.endereco||'sem endereço'}, ${c.cidade}${c.telefone ? ' · '+c.telefone : ''}${c.cnpj ? ' · CNPJ '+c.cnpj : ''}${linhas}`;
+  box.innerHTML = `
+    <div class="hist-top">
+      <strong>${c.nome}</strong>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}
+      <button class="btn ghost" type="button" id="hist-fechar">fechar</button>
+    </div>
+    <div class="hist-dados">
+      <div><span class="hist-label">Cidade</span>${c.cidade || 'não informado'}</div>
+      <div><span class="hist-label">Endereço</span>${c.endereco || 'não informado'}</div>
+      <div><span class="hist-label">Telefone</span>${c.telefone || 'não informado'}</div>
+      <div><span class="hist-label">CNPJ</span>${c.cnpj || 'não informado'}</div>
+    </div>
+    <div class="hist-label" style="margin-top:10px">Histórico de compras</div>
+    ${linhas}
+  `;
   document.querySelector('#view-clientes .card:last-child').appendChild(box);
+  document.getElementById('hist-fechar').addEventListener('click', ()=>box.remove());
   box.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
