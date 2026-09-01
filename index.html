@@ -57,12 +57,20 @@
   <section class="view" id="view-producao">
     <div class="card">
       <h2>Modelos do catálogo</h2>
-      <div class="desc">Referência rápida — o modelo real pode ter outras cores além destas.</div>
+      <div class="desc">Os 12 modelos disponíveis para seleção nos formulários de Produção e Vendas.</div>
       <div class="catalogo-grid">
-        <div class="catalogo-item"><strong>Chalé</strong><span>Rose · Caramelo</span></div>
-        <div class="catalogo-item"><strong>Celeiro</strong><span>Campo · Montanha</span></div>
-        <div class="catalogo-item"><strong>Casinha dois andares</strong><span>Marrom · Bege · Verde · Creme</span></div>
-        <div class="catalogo-item"><strong>Arranhador</strong><span>Verde-musgo · Pink · Azul-marinho · Cinza</span></div>
+        <div class="catalogo-item"><strong>01</strong><span>Casinha Chalé</span></div>
+        <div class="catalogo-item"><strong>02</strong><span>Casinha Cabana</span></div>
+        <div class="catalogo-item"><strong>03</strong><span>Casinha Celeiro</span></div>
+        <div class="catalogo-item"><strong>04</strong><span>Casinha Dois Andares</span></div>
+        <div class="catalogo-item"><strong>05</strong><span>Arranhador Pequeno</span></div>
+        <div class="catalogo-item"><strong>06</strong><span>Arranhador Roda</span></div>
+        <div class="catalogo-item"><strong>07</strong><span>Arranhador Rampa</span></div>
+        <div class="catalogo-item"><strong>08</strong><span>Arranhador Dois Andares</span></div>
+        <div class="catalogo-item"><strong>09</strong><span>Arranhador com Casinha</span></div>
+        <div class="catalogo-item"><strong>10</strong><span>Arranhador Toca</span></div>
+        <div class="catalogo-item"><strong>11</strong><span>Arranhador com Descanso</span></div>
+        <div class="catalogo-item"><strong>12</strong><span>Arranhador Túnel</span></div>
       </div>
     </div>
     <div class="card">
@@ -71,7 +79,7 @@
       <form id="form-producao">
         <div class="row">
           <div class="field"><label>Data</label><input type="date" name="data" required></div>
-          <div class="field"><label>Modelo</label><input type="text" name="modelo" list="lista-modelos" placeholder="Ex: Casinha Redonda" required></div>
+          <div class="field"><label>Modelo</label><select name="modelo" required><option value="">Selecione...</option></select></div>
           <div class="field"><label>Cor</label><input type="text" name="cor" list="lista-cores" placeholder="Ex: Bege" required></div>
           <div class="field" style="flex:0 0 100px"><label>Quantidade</label><input type="number" name="quantidade" min="1" required></div>
         </div>
@@ -96,7 +104,7 @@
           <div class="field" style="flex:1 1 220px"><label>Cliente</label><select name="clienteId" required><option value="">Selecione...</option></select></div>
         </div>
         <div class="row">
-          <div class="field"><label>Modelo</label><input type="text" name="modelo" list="lista-modelos" required></div>
+          <div class="field"><label>Modelo</label><select name="modelo" required><option value="">Selecione...</option></select></div>
           <div class="field"><label>Cor</label><input type="text" name="cor" list="lista-cores" required></div>
           <div class="field" style="flex:0 0 100px"><label>Quantidade</label><input type="number" name="quantidade" min="1" required></div>
           <div class="field" style="flex:0 0 140px"><label>Valor unitário (R$)</label><input type="number" name="valorUnitario" min="0" step="0.01" required></div>
@@ -125,6 +133,12 @@
           <div class="field" style="flex:1 1 220px"><label>Endereço</label><input type="text" name="endereco"></div>
           <div class="field" style="flex:0 0 160px"><label>Telefone</label><input type="text" name="telefone"></div>
         </div>
+        <div class="row">
+          <div class="field" style="flex:0 0 200px"><label>CNPJ</label><input type="text" name="cnpj" placeholder="00.000.000/0000-00"></div>
+          <div class="field" style="flex:1 1 200px;justify-content:flex-end">
+            <label class="checkbox-label"><input type="checkbox" name="precisaNF"> Precisa de emissão de NF</label>
+          </div>
+        </div>
         <button class="btn" type="submit">Adicionar cliente</button>
         <div class="status" id="status-cliente"></div>
       </form>
@@ -135,7 +149,6 @@
     </div>
   </section>
 
-  <datalist id="lista-modelos"></datalist>
   <datalist id="lista-cores"></datalist>
 
   <footer class="footer">

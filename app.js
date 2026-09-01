@@ -58,14 +58,35 @@ function render(){
   renderClientes();
 }
 
-// modelos e cores do catálogo Big Pets, sempre sugeridos além do que já foi digitado
-const CATALOGO_MODELOS = ['Chalé', 'Celeiro', 'Casinha dois andares', 'Arranhador'];
+// modelos do catálogo Big Pets — lista fechada, aparece como seleção nos formulários.
+// Para adicionar/remover um modelo, basta editar esta lista.
+const CATALOGO_MODELOS = [
+  'Casinha Chalé',
+  'Casinha Cabana',
+  'Casinha Celeiro',
+  'Casinha Dois Andares',
+  'Arranhador Pequeno',
+  'Arranhador Roda',
+  'Arranhador Rampa',
+  'Arranhador Dois Andares',
+  'Arranhador com Casinha',
+  'Arranhador Toca',
+  'Arranhador com Descanso',
+  'Arranhador Túnel'
+];
+// cores continuam de preenchimento livre (variam bastante), mas com sugestão do que já foi usado
 const CATALOGO_CORES = ['Rose', 'Caramelo', 'Campo', 'Montanha', 'Marrom', 'Bege', 'Verde', 'Creme', 'Verde-musgo', 'Pink', 'Azul-marinho', 'Cinza'];
 
+function renderModeloSelects(){
+  const options = '<option value="">Selecione...</option>' + CATALOGO_MODELOS.map(m=>`<option value="${m}">${m}</option>`).join('');
+  document.querySelector('#form-producao select[name=modelo]').innerHTML = options;
+  document.querySelector('#form-venda select[name=modelo]').innerHTML = options;
+}
+renderModeloSelects();
+
 function renderDatalists(){
-  const modelos = new Set(CATALOGO_MODELOS), cores = new Set(CATALOGO_CORES);
-  [...dados.producoes, ...dados.vendas].forEach(x=>{ modelos.add(x.modelo); cores.add(x.cor); });
-  document.getElementById('lista-modelos').innerHTML = [...modelos].map(m=>`<option value="${m}">`).join('');
+  const cores = new Set(CATALOGO_CORES);
+  [...dados.producoes, ...dados.vendas].forEach(x=>{ cores.add(x.cor); });
   document.getElementById('lista-cores').innerHTML = [...cores].map(c=>`<option value="${c}">`).join('');
 }
 
@@ -156,7 +177,9 @@ document.getElementById('form-cliente').addEventListener('submit', async e=>{
       nome: f.get('nome').trim(),
       cidade: f.get('cidade').trim(),
       endereco: f.get('endereco').trim(),
-      telefone: f.get('telefone').trim()
+      telefone: f.get('telefone').trim(),
+      cnpj: f.get('cnpj').trim(),
+      precisaNF: f.get('precisaNF') === 'on'
     });
     e.target.reset();
     statusEl.textContent = 'Cliente adicionado.'; statusEl.className = 'status ok';
@@ -167,7 +190,7 @@ document.getElementById('form-cliente').addEventListener('submit', async e=>{
 
 function renderClientes(){
   const rows = dados.clientes.map(c=>
-    `<tr><td><span class="client-link" data-ver-historico="${c.id}">${c.nome}</span></td><td>${c.cidade}</td><td>${c.telefone||'—'}</td>
+    `<tr><td><span class="client-link" data-ver-historico="${c.id}">${c.nome}</span>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}</td><td>${c.cidade}</td><td>${c.telefone||'—'}</td>
       <td><button class="btn ghost" data-remover-cliente="${c.id}">remover</button></td></tr>`
   ).join('');
   document.querySelector('#tbl-clientes tbody').innerHTML = rows || `<tr><td colspan="4" class="empty">Nenhum cliente cadastrado.</td></tr>`;
@@ -195,7 +218,7 @@ function verHistorico(id){
   const box = document.createElement('div');
   box.className = 'hist-box';
   box.id = 'hist-temp';
-  box.innerHTML = `<strong>${c.nome}</strong> — ${c.endereco||'sem endereço'}, ${c.cidade}${c.telefone ? ' · '+c.telefone : ''}${linhas}`;
+  box.innerHTML = `<strong>${c.nome}</strong>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''} — ${c.endereco||'sem endereço'}, ${c.cidade}${c.telefone ? ' · '+c.telefone : ''}${c.cnpj ? ' · CNPJ '+c.cnpj : ''}${linhas}`;
   document.querySelector('#view-clientes .card:last-child').appendChild(box);
   box.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
