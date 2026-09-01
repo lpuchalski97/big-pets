@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot
+  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -168,21 +168,54 @@ document.querySelector('#tbl-producao tbody').addEventListener('click', async e=
 });
 
 // ---- clientes ----
+let editandoClienteId = null;
+
+function iniciarEdicaoCliente(id){
+  const c = dados.clientes.find(c=>c.id===id);
+  if(!c) return;
+  const form = document.getElementById('form-cliente');
+  form.nome.value = c.nome || '';
+  form.cidade.value = c.cidade || '';
+  form.endereco.value = c.endereco || '';
+  form.telefone.value = c.telefone || '';
+  form.cnpj.value = c.cnpj || '';
+  form.precisaNF.checked = !!c.precisaNF;
+  editandoClienteId = id;
+  document.getElementById('btn-submit-cliente').textContent = 'Salvar alterações';
+  document.getElementById('btn-cancelar-cliente').style.display = 'inline-block';
+  form.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function cancelarEdicaoCliente(){
+  editandoClienteId = null;
+  document.getElementById('form-cliente').reset();
+  document.getElementById('btn-submit-cliente').textContent = 'Adicionar cliente';
+  document.getElementById('btn-cancelar-cliente').style.display = 'none';
+}
+document.getElementById('btn-cancelar-cliente').addEventListener('click', cancelarEdicaoCliente);
+
 document.getElementById('form-cliente').addEventListener('submit', async e=>{
   e.preventDefault();
   const f = new FormData(e.target);
   const statusEl = document.getElementById('status-cliente');
+  const dadosCliente = {
+    nome: f.get('nome').trim(),
+    cidade: f.get('cidade').trim(),
+    endereco: f.get('endereco').trim(),
+    telefone: f.get('telefone').trim(),
+    cnpj: f.get('cnpj').trim(),
+    precisaNF: f.get('precisaNF') === 'on'
+  };
   try{
-    await addDoc(collection(db,'clientes'), {
-      nome: f.get('nome').trim(),
-      cidade: f.get('cidade').trim(),
-      endereco: f.get('endereco').trim(),
-      telefone: f.get('telefone').trim(),
-      cnpj: f.get('cnpj').trim(),
-      precisaNF: f.get('precisaNF') === 'on'
-    });
-    e.target.reset();
-    statusEl.textContent = 'Cliente adicionado.'; statusEl.className = 'status ok';
+    if(editandoClienteId){
+      await updateDoc(doc(db,'clientes',editandoClienteId), dadosCliente);
+      statusEl.textContent = 'Cliente atualizado.'; statusEl.className = 'status ok';
+      cancelarEdicaoCliente();
+    }else{
+      await addDoc(collection(db,'clientes'), dadosCliente);
+      e.target.reset();
+      statusEl.textContent = 'Cliente adicionado.'; statusEl.className = 'status ok';
+    }
   }catch(err){
     statusEl.textContent = 'Erro ao salvar. Verifique a conexão.'; statusEl.className = 'status err';
   }
@@ -191,9 +224,10 @@ document.getElementById('form-cliente').addEventListener('submit', async e=>{
 function renderClientes(){
   const rows = dados.clientes.map(c=>
     `<tr><td><span class="client-link" data-ver-historico="${c.id}">${c.nome}</span>${c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}</td><td>${c.cidade}</td><td>${c.telefone||'—'}</td>
+      <td><button class="btn ghost" data-editar-cliente="${c.id}">editar</button></td>
       <td><button class="btn ghost" data-remover-cliente="${c.id}">remover</button></td></tr>`
   ).join('');
-  document.querySelector('#tbl-clientes tbody').innerHTML = rows || `<tr><td colspan="4" class="empty">Nenhum cliente cadastrado.</td></tr>`;
+  document.querySelector('#tbl-clientes tbody').innerHTML = rows || `<tr><td colspan="5" class="empty">Nenhum cliente cadastrado.</td></tr>`;
 
   const sel = document.querySelector('#form-venda select[name=clienteId]');
   const atual = sel.value;
@@ -204,8 +238,10 @@ function renderClientes(){
 document.querySelector('#tbl-clientes tbody').addEventListener('click', async e=>{
   const remId = e.target.dataset.removerCliente;
   const histId = e.target.dataset.verHistorico;
+  const editId = e.target.dataset.editarCliente;
   if(remId) await deleteDoc(doc(db,'clientes',remId));
   if(histId) verHistorico(histId);
+  if(editId) iniciarEdicaoCliente(editId);
 });
 
 function verHistorico(id){
