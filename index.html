@@ -33,6 +33,7 @@
     <button data-view="painel" class="active">Painel</button>
     <button data-view="producao">Produção</button>
     <button data-view="vendas">Vendas</button>
+    <button data-view="rota">Rota</button>
     <button data-view="clientes">Clientes</button>
   </nav>
 
@@ -109,13 +110,48 @@
           <div class="field" style="flex:0 0 100px"><label>Quantidade</label><input type="number" name="quantidade" min="1" required></div>
           <div class="field" style="flex:0 0 140px"><label>Valor unitário (R$)</label><input type="number" name="valorUnitario" min="0" step="0.01" required></div>
         </div>
+        <div class="row">
+          <div class="field" style="flex:1 1 200px">
+            <label>Forma de pagamento</label>
+            <select name="formaPagamento" required>
+              <option value="">Selecione...</option>
+              <option value="Débito">Débito</option>
+              <option value="Pix Márcio">Pix Márcio</option>
+              <option value="Pix Adriana">Pix Adriana</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Crédito à vista">Crédito à vista</option>
+              <option value="Crédito parcelado">Crédito parcelado</option>
+            </select>
+          </div>
+        </div>
         <button class="btn" type="submit">Adicionar venda</button>
         <div class="status" id="status-venda"></div>
       </form>
     </div>
     <div class="card">
       <h2>Histórico de vendas</h2>
-      <table id="tbl-vendas"><thead><tr><th>Data</th><th>Cliente</th><th>Produto</th><th>Qtd.</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
+      <div class="table-scroll">
+        <table id="tbl-vendas"><thead><tr><th>Data</th><th>Cliente</th><th>Produto</th><th>Qtd.</th><th>Total</th><th>Pagamento</th><th></th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROTA -->
+  <section class="view" id="view-rota">
+    <div class="card">
+      <h2>Montar rota</h2>
+      <div class="desc">Escolha uma cidade para ver os clientes cadastrados nela.</div>
+      <div class="field" style="max-width:280px">
+        <label>Cidade</label>
+        <select id="rota-cidade"><option value="">Selecione uma cidade...</option></select>
+      </div>
+    </div>
+    <div class="card" id="rota-resultado-card" style="display:none">
+      <h2 id="rota-titulo">Clientes</h2>
+      <div class="desc">Quem está há mais tempo sem comprar aparece primeiro.</div>
+      <div class="table-scroll">
+        <table id="tbl-rota"><thead><tr><th>Cliente</th><th>Endereço</th><th>Telefone</th><th>Última compra</th></tr></thead><tbody></tbody></table>
+      </div>
     </div>
   </section>
 

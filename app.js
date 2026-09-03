@@ -56,6 +56,8 @@ function render(){
   renderProducao();
   renderVendas();
   renderClientes();
+  renderRotaCidades();
+  renderRotaResultado();
 }
 
 // modelos do catálogo Big Pets — lista fechada, aparece como seleção nos formulários.
@@ -247,7 +249,7 @@ document.querySelector('#tbl-clientes tbody').addEventListener('click', async e=
 function verHistorico(id){
   const c = dados.clientes.find(c=>c.id===id);
   const vendas = dados.vendas.filter(v=>v.clienteId===id).sort((a,b)=>b.data.localeCompare(a.data));
-  const linhas = vendas.map(v=>`<div class="hrow"><span>${fmtData(v.data)} — ${v.modelo} ${v.cor} (${v.quantidade}un)</span><span>${fmtBRL(v.valorTotal)}</span></div>`).join('')
+  const linhas = vendas.map(v=>`<div class="hrow"><span>${fmtData(v.data)} — ${v.modelo} ${v.cor} (${v.quantidade}un)${v.formaPagamento ? ' · '+v.formaPagamento : ''}</span><span>${fmtBRL(v.valorTotal)}</span></div>`).join('')
     || '<div class="hrow"><span>Nenhuma compra registrada.</span></div>';
   const existente = document.getElementById('hist-temp');
   if(existente) existente.remove();
@@ -288,7 +290,8 @@ document.getElementById('form-venda').addEventListener('submit', async e=>{
       cor: f.get('cor').trim(),
       quantidade: qtd,
       valorUnitario: valorUnit,
-      valorTotal: qtd*valorUnit
+      valorTotal: qtd*valorUnit,
+      formaPagamento: f.get('formaPagamento')
     });
     e.target.reset();
     statusEl.textContent = 'Venda registrada.'; statusEl.className = 'status ok';
@@ -301,12 +304,59 @@ function renderVendas(){
   const rows = [...dados.vendas].sort((a,b)=>b.data.localeCompare(a.data))
     .map(v=>{
       const cliente = dados.clientes.find(c=>c.id===v.clienteId);
-      return `<tr><td>${fmtData(v.data)}</td><td>${cliente ? cliente.nome : '—'}</td><td>${v.modelo} ${v.cor}</td><td>${v.quantidade}</td><td>${fmtBRL(v.valorTotal)}</td>
+      return `<tr><td>${fmtData(v.data)}</td><td>${cliente ? cliente.nome : '—'}</td><td>${v.modelo} ${v.cor}</td><td>${v.quantidade}</td><td>${fmtBRL(v.valorTotal)}</td><td>${v.formaPagamento||'—'}</td>
         <td><button class="btn ghost" data-remover-venda="${v.id}">remover</button></td></tr>`;
     }).join('');
-  document.querySelector('#tbl-vendas tbody').innerHTML = rows || `<tr><td colspan="6" class="empty">Nenhuma venda registrada.</td></tr>`;
+  document.querySelector('#tbl-vendas tbody').innerHTML = rows || `<tr><td colspan="7" class="empty">Nenhuma venda registrada.</td></tr>`;
 }
 document.querySelector('#tbl-vendas tbody').addEventListener('click', async e=>{
   const id = e.target.dataset.removerVenda;
   if(id) await deleteDoc(doc(db,'vendas',id));
 });
+
+// ---- rota ----
+function renderRotaCidades(){
+  const sel = document.getElementById('rota-cidade');
+  const atual = sel.value;
+  const cidades = [...new Set(dados.clientes.map(c=>c.cidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML = '<option value="">Selecione uma cidade...</option>' + cidades.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.value = atual;
+}
+
+function renderRotaResultado(){
+  const cidade = document.getElementById('rota-cidade').value;
+  const card = document.getElementById('rota-resultado-card');
+  if(!cidade){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const hoje = new Date();
+  const ultimaCompra = {};
+  dados.vendas.forEach(v=>{
+    if(!ultimaCompra[v.clienteId] || v.data > ultimaCompra[v.clienteId]) ultimaCompra[v.clienteId] = v.data;
+  });
+
+  const clientesCidade = dados.clientes
+    .filter(c=>c.cidade === cidade)
+    .map(c=>{
+      const ult = ultimaCompra[c.id];
+      const dias = ult ? Math.floor((hoje - new Date(ult+'T00:00:00'))/86400000) : null;
+      return {c, ult, dias};
+    })
+    .sort((a,b)=>{
+      if(a.dias===null && b.dias===null) return a.c.nome.localeCompare(b.c.nome);
+      if(a.dias===null) return -1;
+      if(b.dias===null) return 1;
+      return b.dias - a.dias;
+    });
+
+  document.getElementById('rota-titulo').textContent = `Clientes em ${cidade} (${clientesCidade.length})`;
+
+  const rows = clientesCidade.map(x=>{
+    const tag = x.dias===null
+      ? '<span class="tag alert">nunca comprou</span>'
+      : x.dias>60 ? `<span class="tag alert">${x.dias} dias</span>` : `<span class="tag">${x.dias} dias</span>`;
+    return `<tr><td>${x.c.nome}${x.c.precisaNF ? ' <span class="tag nf">NF</span>' : ''}</td><td>${x.c.endereco||'—'}</td><td>${x.c.telefone||'—'}</td><td>${tag}</td></tr>`;
+  }).join('');
+  document.querySelector('#tbl-rota tbody').innerHTML = rows || `<tr><td colspan="4" class="empty">Nenhum cliente cadastrado nessa cidade.</td></tr>`;
+}
+document.getElementById('rota-cidade').addEventListener('change', renderRotaResultado);
