@@ -58,6 +58,8 @@ function render(){
   renderClientes();
   renderRotaCidades();
   renderRotaResultado();
+  renderRelatorioClientes();
+  renderRelatorioResultado();
 }
 
 // modelos do catálogo Big Pets — lista fechada, aparece como seleção nos formulários.
@@ -360,3 +362,38 @@ function renderRotaResultado(){
   document.querySelector('#tbl-rota tbody').innerHTML = rows || `<tr><td colspan="4" class="empty">Nenhum cliente cadastrado nessa cidade.</td></tr>`;
 }
 document.getElementById('rota-cidade').addEventListener('change', renderRotaResultado);
+
+// ---- relatórios ----
+function renderRelatorioClientes(){
+  const sel = document.getElementById('relatorio-cliente');
+  const atual = sel.value;
+  const ordenados = [...dados.clientes].sort((a,b)=>a.nome.localeCompare(b.nome));
+  sel.innerHTML = '<option value="">Selecione um cliente...</option>' +
+    ordenados.map(c=>`<option value="${c.id}">${c.nome} — ${c.cidade}</option>`).join('');
+  sel.value = atual;
+}
+
+function renderRelatorioResultado(){
+  const clienteId = document.getElementById('relatorio-cliente').value;
+  const card = document.getElementById('relatorio-resultado-card');
+  if(!clienteId){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const cliente = dados.clientes.find(c=>c.id===clienteId);
+  const vendas = dados.vendas.filter(v=>v.clienteId===clienteId).sort((a,b)=>a.data.localeCompare(b.data));
+
+  document.getElementById('relatorio-titulo').textContent = cliente ? `Vendas de ${cliente.nome}` : 'Vendas';
+
+  const rows = vendas.map(v=>
+    `<tr><td>${fmtData(v.data)}</td><td>${v.modelo} ${v.cor}</td><td>${v.quantidade}</td><td>${fmtBRL(v.valorUnitario)}</td><td>${fmtBRL(v.valorTotal)}</td><td>${v.formaPagamento||'—'}</td></tr>`
+  ).join('');
+  document.querySelector('#tbl-relatorio tbody').innerHTML = rows || `<tr><td colspan="6" class="empty">Nenhuma venda registrada para esse cliente.</td></tr>`;
+
+  const totalQtd = vendas.reduce((s,v)=>s+v.quantidade,0);
+  const totalValor = vendas.reduce((s,v)=>s+v.valorTotal,0);
+  document.getElementById('relatorio-total').textContent = vendas.length
+    ? `${vendas.length} venda(s) · ${totalQtd} peça(s) · total ${fmtBRL(totalValor)}`
+    : '';
+}
+document.getElementById('relatorio-cliente').addEventListener('change', renderRelatorioResultado);
+document.getElementById('btn-imprimir-relatorio').addEventListener('click', ()=>window.print());

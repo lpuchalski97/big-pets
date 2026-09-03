@@ -159,3 +159,13 @@ tr:last-child td{border-bottom:none;}
   color:var(--ink-soft);
   padding-top:18px;
 }
+
+.relatorio-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+.relatorio-total{margin-top:12px;padding-top:12px;border-top:1.5px solid var(--line);font-size:14px;font-weight:600;color:var(--wood-dark);text-align:right;}
+
+@media print{
+  nav.tabs, .no-print, .sync-indicator{display:none !important;}
+  body{background:#fff;}
+  .app{max-width:100%;padding:0;}
+  .card{border:none;padding:0;}
+}

@@ -35,6 +35,7 @@
     <button data-view="vendas">Vendas</button>
     <button data-view="rota">Rota</button>
     <button data-view="clientes">Clientes</button>
+    <button data-view="relatorios">Relatórios</button>
   </nav>
 
   <!-- PAINEL -->
@@ -186,6 +187,28 @@
       <div class="table-scroll">
         <table id="tbl-clientes"><thead><tr><th>Nome</th><th>Cidade</th><th>CNPJ</th><th>Telefone</th><th colspan="2"></th></tr></thead><tbody></tbody></table>
       </div>
+    </div>
+  </section>
+
+  <!-- RELATÓRIOS -->
+  <section class="view" id="view-relatorios">
+    <div class="card no-print">
+      <h2>Relatório de vendas por cliente</h2>
+      <div class="desc">Escolha um cliente para ver todas as vendas registradas.</div>
+      <div class="field" style="max-width:320px">
+        <label>Cliente</label>
+        <select id="relatorio-cliente"><option value="">Selecione um cliente...</option></select>
+      </div>
+    </div>
+    <div class="card" id="relatorio-resultado-card" style="display:none">
+      <div class="relatorio-header">
+        <h2 id="relatorio-titulo">Vendas</h2>
+        <button class="btn ghost no-print" type="button" id="btn-imprimir-relatorio">imprimir</button>
+      </div>
+      <div class="table-scroll">
+        <table id="tbl-relatorio"><thead><tr><th>Data</th><th>Produto</th><th>Qtd.</th><th>Valor unit.</th><th>Total</th><th>Pagamento</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="relatorio-total" id="relatorio-total"></div>
     </div>
   </section>
 
